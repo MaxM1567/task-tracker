@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberSwipeableState
@@ -33,6 +34,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +46,7 @@ import androidx.navigation.NavController
 import com.example.task_tracker.Screen
 import com.example.task_tracker.TaskViewModel
 import com.example.task_tracker.data.Task
+import java.time.LocalDate
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -56,12 +63,22 @@ fun HomeView(
                 Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
         }) { padding ->
-        Column {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            Text(
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 32.dp),
+                text = "${LocalDate.now()}",
+                fontSize = 36.sp,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+            )
             val taskList = viewModel.taskList.collectAsState(initial = listOf())
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding)
             ) {
                 items(taskList.value, key = { task -> task.id }) { task ->
                     val swipeableState = rememberSwipeableState(initialValue = 0)
@@ -120,12 +137,13 @@ fun TaskCard(task: Task) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(horizontal = 12.dp, vertical = 24.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = task.title,
-                fontSize = 16.sp
+                fontSize = 18.sp,
+                textDecoration = if (task.isDone) TextDecoration.LineThrough else null
             )
         }
     }
