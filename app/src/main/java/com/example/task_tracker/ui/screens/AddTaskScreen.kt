@@ -22,7 +22,7 @@ import com.example.task_tracker.data.Task
 import kotlinx.coroutines.launch
 
 @Composable
-fun AddTaskView(
+fun AddTaskScreen(
     viewModel: TaskViewModel,
     navController: NavController
 ) {

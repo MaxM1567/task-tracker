@@ -1,4 +1,4 @@
-package com.example.task_tracker.ui.screens
+package com.example.task_tracker.ui.screens.home
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -14,10 +14,10 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberSwipeableState
@@ -34,9 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.IntOffset
@@ -51,15 +49,15 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeView(
+fun HomeScreen(
     viewModel: TaskViewModel, navController: NavController
 ) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                modifier = Modifier.padding(all = 20.dp), onClick = {
-                    navController.navigate(Screen.AddScreen.route)
-                }) {
+                shape = CircleShape,
+                onClick = { navController.navigate(Screen.AddTaskScreen.route) })
+            {
                 Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
         }) { padding ->
@@ -68,12 +66,20 @@ fun HomeView(
                 .fillMaxSize()
                 .padding(padding)
         ) {
+            val curDate = getFormattedDate()
             Text(
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 32.dp),
-                text = "${LocalDate.now()}",
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 16.dp),
+                text = "${curDate.day} ${curDate.month.uppercase()}",
                 fontSize = 36.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                modifier = Modifier.padding(start = 13.dp, end = 8.dp, bottom = 16.dp),
+                text = curDate.dayOfWeek,
+                fontSize = 16.sp,
                 fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Bold,
+                color = Color.Gray
             )
             val taskList = viewModel.taskList.collectAsState(initial = listOf())
             LazyColumn(
@@ -120,31 +126,25 @@ fun HomeView(
     }
 }
 
-@Composable
-fun TaskCard(task: Task) {
-    Card(
-        shape = RoundedCornerShape(18.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
-            .border(
-                width = if (task.isDone) 4.dp else 0.dp,
-                color = if (task.isDone) Color.Green else Color.Transparent,
-                shape = RoundedCornerShape(18.dp)
-            )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 24.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = task.title,
-                fontSize = 18.sp,
-                textDecoration = if (task.isDone) TextDecoration.LineThrough else null
-            )
-        }
-    }
+data class Date(
+    val day: Int,
+    val month: String,
+    val dayOfWeek: String
+)
+
+fun getFormattedDate(currentDate: LocalDate = LocalDate.now()): Date {
+    val monthNames = listOf(
+        "Января", "Февраля", "Марта", "Апреля", "Мая", "Июня",
+        "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"
+    )
+    val dayNames = listOf(
+        "Понедельник", "Вторник", "Среда",
+        "Четверг", "Пятница", "Суббота", "Воскресенье"
+    )
+
+    return Date(
+        day = currentDate.dayOfMonth,
+        month = monthNames[currentDate.monthValue - 1],
+        dayOfWeek = dayNames[currentDate.dayOfWeek.value - 1]
+    )
 }
