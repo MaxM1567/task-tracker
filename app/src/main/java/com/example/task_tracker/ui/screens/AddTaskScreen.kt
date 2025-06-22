@@ -1,12 +1,22 @@
 package com.example.task_tracker.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,27 +46,47 @@ fun AddTaskScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            WishTextField(
-                label = "Название",
-                value = viewModel.taskTitleState,
-                onValueChanged = { viewModel.onWishTitleChanged(it) })
-
-            Button(onClick = {
-                viewModel.addTask(
-                    Task(title = viewModel.taskTitleState.trim())
-                )
-                scope.launch {
-                    navController.navigateUp()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(Modifier.weight(1f).padding(bottom = 7.dp)) {
+                    TaskTextField(
+                        label = "Название",
+                        value = viewModel.taskTitleState,
+                        onValueChanged = { viewModel.onWishTitleChanged(it) }
+                    )
                 }
-            }) {
-                Text("Добавить задачу")
+                Spacer(modifier = Modifier.padding(8.dp))
+
+                IconButton(
+                    modifier = Modifier.size(58.dp),
+                    colors = IconButtonDefaults.iconButtonColors().copy(
+                        containerColor = MaterialTheme.colors.primary
+                    ),
+                    onClick = {
+                        viewModel.addTask(
+                            Task(title = viewModel.taskTitleState.trim())
+                        )
+                        scope.launch {
+                            navController.navigateUp()
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Добавить задачу"
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun WishTextField(
+fun TaskTextField(
     label: String,
     value: String,
     onValueChanged: (String) -> Unit
@@ -65,9 +95,8 @@ fun WishTextField(
         value = value,
         onValueChange = onValueChanged,
         label = { Text(text = label) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+        shape = CircleShape,
+        modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
     )
 }

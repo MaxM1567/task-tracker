@@ -33,7 +33,7 @@ fun TaskCard(task: Task) {
         ),
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+            .padding(top = 4.dp, bottom = 4.dp, start = 8.dp, end = 8.dp)
 //            .border(
 //                width = if (task.isDone) 4.dp else 0.dp,
 //                color = if (task.isDone) Color.Green.copy(alpha = 0.5f) else Color.Transparent,
