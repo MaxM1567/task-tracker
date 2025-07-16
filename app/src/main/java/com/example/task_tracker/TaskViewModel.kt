@@ -7,12 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.task_tracker.data.Task
 import com.example.task_tracker.data.TaskRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TaskViewModel(
-    private val taskRepository: TaskRepository = Graph.taskRepository
+@HiltViewModel
+class TaskViewModel @Inject constructor(
+    private val taskRepository: TaskRepository
 ) : ViewModel() {
     var taskTitleState by mutableStateOf("")
 

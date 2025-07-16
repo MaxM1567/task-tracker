@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.task_tracker.TaskViewModel
 import com.example.task_tracker.data.Task
@@ -33,9 +34,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AddTaskScreen(
-    viewModel: TaskViewModel,
     navController: NavController
 ) {
+    val viewModel: TaskViewModel = hiltViewModel()
     val scope = rememberCoroutineScope()
 
     Scaffold {
@@ -52,7 +53,9 @@ fun AddTaskScreen(
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(Modifier.weight(1f).padding(bottom = 7.dp)) {
+                Box(Modifier
+                    .weight(1f)
+                    .padding(bottom = 7.dp)) {
                     TaskTextField(
                         label = "Название",
                         value = viewModel.taskTitleState,

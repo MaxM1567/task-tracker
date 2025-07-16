@@ -27,14 +27,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.task_tracker.TaskViewModel
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreen(
-    viewModel: TaskViewModel,
-) {
+fun HomeScreen() {
+    val viewModel: TaskViewModel = hiltViewModel()
+
     Column(
         modifier = Modifier
             .fillMaxSize()

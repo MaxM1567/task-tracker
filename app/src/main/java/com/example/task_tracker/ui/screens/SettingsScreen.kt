@@ -19,10 +19,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.task_tracker.TaskViewModel
 
 @Composable
-fun SettingScreen(viewModel: TaskViewModel) {
+fun SettingScreen() {
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {

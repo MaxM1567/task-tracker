@@ -24,12 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.example.task_tracker.Navigation
-import com.example.task_tracker.TaskViewModel
 import com.example.task_tracker.ui.screens.Screen
 import com.example.task_tracker.ui.screens.Screen.BottomScreen
 import com.example.task_tracker.ui.screens.bottomScreens
@@ -37,17 +35,15 @@ import com.example.task_tracker.ui.screens.bottomScreens
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MainScreen() {
-    val viewModel: TaskViewModel = viewModel()
-    val navController: NavController = rememberNavController()
-
+fun MainScreen(
+    navController: NavHostController
+) {
     Scaffold(
         bottomBar = {
             HomeBottomBar(navController = navController)
         }
     ) { padding ->
         Navigation(
-            viewModel = viewModel,
             navController = navController,
             pd = padding
         )
