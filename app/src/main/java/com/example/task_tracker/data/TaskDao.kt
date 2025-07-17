@@ -19,9 +19,6 @@ abstract class TaskDao {
     @Update()
     abstract suspend fun updateTask(taskEntity: Task)
 
-    @Query("Update `task-table` SET `task-is-done`=0")
-    abstract suspend fun resetDailyTasks()
-
     @Delete
     abstract suspend fun deleteTask(taskEntity: Task)
 }

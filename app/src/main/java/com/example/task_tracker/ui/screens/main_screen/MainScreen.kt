@@ -9,14 +9,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.primarySurface
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -64,7 +63,9 @@ fun HomeBottomBar(navController: NavController) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
-            shape = CircleShape, elevation = 8.dp, modifier = Modifier
+            shape = CircleShape,
+            shadowElevation = 8.dp,
+            modifier = Modifier
                 .weight(1f)
                 .padding(
                     end = when (currentRoute) {
@@ -74,7 +75,9 @@ fun HomeBottomBar(navController: NavController) {
                 )
         ) {
             BottomNavigation(
-                modifier = Modifier.clip(CircleShape), elevation = 0.dp
+                modifier = Modifier.clip(CircleShape),
+                elevation = 0.dp,
+                backgroundColor = FloatingActionButtonDefaults.containerColor
             ) {
                 bottomScreens.forEach { item ->
                     BottomNavigationItem(
@@ -90,7 +93,6 @@ fun HomeBottomBar(navController: NavController) {
                 onClick = { navController.navigate(Screen.AddTaskScreen.route) },
                 modifier = Modifier.size(56.dp),
                 shape = CircleShape,
-                containerColor = MaterialTheme.colors.primarySurface
             ) {
                 Icon(Icons.Default.Add, "Add")
             }

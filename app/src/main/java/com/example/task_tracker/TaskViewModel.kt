@@ -1,6 +1,7 @@
 package com.example.task_tracker
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -18,6 +19,7 @@ class TaskViewModel @Inject constructor(
     private val taskRepository: TaskRepository
 ) : ViewModel() {
     var taskTitleState by mutableStateOf("")
+    var taskRepetitions by mutableIntStateOf(1)
 
     fun onWishTitleChanged(newString: String) {
         taskTitleState = newString

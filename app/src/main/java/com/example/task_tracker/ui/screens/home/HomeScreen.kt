@@ -1,5 +1,6 @@
 package com.example.task_tracker.ui.screens.home
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
@@ -85,7 +86,13 @@ fun HomeScreen() {
                 LaunchedEffect(swipeableState.currentValue) {
                     when (swipeableState.currentValue) {
                         1 -> {
-                            viewModel.updateTask(task.copy(isDone = !task.isDone))
+                            if (task.curRepetitions - 1 >= 0) {
+                                Log.d("ABOBA", "До $task")
+                                viewModel.updateTask(task.copy(curRepetitions = task.curRepetitions - 1))
+                                Log.d("ABOBA", "После $task")
+                            } else {
+                                viewModel.updateTask(task.copy(curRepetitions = task.repetitions))
+                            }
                             swipeableState.animateTo(0)
                         }
 

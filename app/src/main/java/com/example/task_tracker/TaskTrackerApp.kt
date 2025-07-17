@@ -7,6 +7,7 @@ import com.example.task_tracker.data.TaskRepository
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -29,13 +30,18 @@ class TaskTrackerApp : Application() {
         val lastResetDate = prefs.getString("last_reset_date", "")
 
         if (lastResetDate != currentDate) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    taskRepository.resetDailyTasks()
+            try {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val tasks = taskRepository.getTasks().first()
+                    tasks.forEach { task ->
+                        taskRepository.updateTask(task.copy(
+                            curRepetitions = task.repetitions)
+                        )
+                    }
                     prefs.edit { putString("last_reset_date", currentDate) }
-                } catch (e: Exception) {
-                    Log.e("TaskDailyReset", "Ошибка сброса задач", e)
                 }
+            } catch (e: Exception) {
+                Log.e("TaskDailyReset", "Ошибка сброса задач", e)
             }
         }
     }

@@ -10,6 +10,8 @@ data class Task(
     val id: Long = 0L,
     @ColumnInfo(name = "task-title")
     val title: String = "",
-    @ColumnInfo(name = "task-is-done")
-    val isDone: Boolean = false
+    @ColumnInfo(name = "task-repetitions")
+    val repetitions: Int = 1,
+    @ColumnInfo(name = "task-cur-repetitions")
+    val curRepetitions: Int = 1,
 )
