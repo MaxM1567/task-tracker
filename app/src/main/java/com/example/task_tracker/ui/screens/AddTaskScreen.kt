@@ -16,17 +16,15 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.task_tracker.TaskViewModel
 import com.example.task_tracker.data.Task
@@ -34,28 +32,16 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AddTaskScreen(
+    viewModel: TaskViewModel,
     navController: NavController
 ) {
-    val viewModel: TaskViewModel = hiltViewModel()
     val scope = rememberCoroutineScope()
-    Column {
-        Text(
-            modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 16.dp),
-            text = "Задача",
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Bold,
-        )
-        /*
-        Text(
-            modifier = Modifier.padding(start = 10.dp, end = 8.dp, bottom = 16.dp),
-            text = "Создайте новую задачу",
-            fontSize = 16.sp,
-            fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight.Bold,
-            color = Color.Gray
-        )
-        */
-    }
+
+    Text(
+        modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+        text = "Задача",
+        style = MaterialTheme.typography.titleMedium
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -147,21 +133,3 @@ fun AddTaskScreen(
         }
     }
 }
-/*
-@Composable
-fun TaskTextField(
-    modifier: Modifier,
-    label: String,
-    value: String,
-    onValueChanged: (String) -> Unit
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChanged,
-        label = { Text(text = label) },
-        shape = CircleShape,
-        modifier = modifier,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-    )
-}
-*/

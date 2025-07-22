@@ -36,12 +36,7 @@ fun TaskCard(task: Task) {
         modifier = Modifier
             .fillMaxSize()
             .height(85.dp)
-            .padding(top = 4.dp, bottom = 4.dp, start = 8.dp, end = 8.dp)
-//            .border(
-//                width = if (task.isDone) 4.dp else 0.dp,
-//                color = if (task.isDone) Color.Green.copy(alpha = 0.5f) else Color.Transparent,
-//                shape = RoundedCornerShape(18.dp)
-//            )
+            .padding(vertical = 4.dp, horizontal = 16.dp)
     ) {
         Row(
             modifier = Modifier
