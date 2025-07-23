@@ -2,7 +2,6 @@ package com.example.task_tracker
 
 import android.app.Application
 import android.content.Context.MODE_PRIVATE
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -19,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -38,20 +36,17 @@ class TaskViewModel @Inject constructor(
     var taskTitleState by mutableStateOf("")
     var taskRepetitions by mutableIntStateOf(1)
 
+    lateinit var taskList: Flow<List<Task>>
+
     init {
         updateDate()
+        viewModelScope.launch {
+            taskList = taskRepository.getTasks()
+        }
     }
 
     fun onWishTitleChanged(newString: String) {
         taskTitleState = newString
-    }
-
-    lateinit var taskList: Flow<List<Task>>
-
-    init {
-        viewModelScope.launch {
-            taskList = taskRepository.getTasks()
-        }
     }
 
     fun addTask(task: Task) {
@@ -61,7 +56,7 @@ class TaskViewModel @Inject constructor(
     }
 
     fun updateTask(task: Task) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             taskRepository.updateTask(task = task)
         }
     }
@@ -69,6 +64,21 @@ class TaskViewModel @Inject constructor(
     fun deleteTask(task: Task) {
         viewModelScope.launch(Dispatchers.IO) {
             taskRepository.deleteTask(task = task)
+        }
+    }
+
+    fun resetTasks() {
+        viewModelScope.launch(Dispatchers.IO) {
+            taskRepository.resetTasks()
+        }
+    }
+
+    fun updateUI() {
+        viewModelScope.launch {
+            if (isNewDay()) {
+                resetTasks()
+                updateDate()
+            }
         }
     }
 
@@ -83,31 +93,6 @@ class TaskViewModel @Inject constructor(
         } else {
             false
         }
-    }
-
-    fun updateUI() {
-        if (isNewDay()) {
-            resetTasks()
-        }
-        updateDate()
-    }
-
-    fun resetTasks() {
-        try {
-            viewModelScope.launch {
-                val tasks = taskRepository.getTasks().first()
-                tasks.forEach { task ->
-                    taskRepository.updateTask(
-                        task.copy(
-                            curRepetitions = task.repetitions
-                        )
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("TaskDailyReset", "Ошибка сброса задач", e)
-        }
-
     }
 
     fun updateDate() {
