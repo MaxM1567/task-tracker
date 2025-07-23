@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.task_tracker.data.Task
@@ -76,7 +77,12 @@ class TaskViewModel @Inject constructor(
         val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
         val lastResetDate = prefs.getString("last_reset_date", "")
 
-        return lastResetDate != currentDate
+        return if (lastResetDate != currentDate) {
+            prefs.edit { putString("last_reset_date", currentDate) }
+            true
+        } else {
+            false
+        }
     }
 
     fun updateUI() {
