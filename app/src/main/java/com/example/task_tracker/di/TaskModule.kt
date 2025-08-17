@@ -1,8 +1,8 @@
 package com.example.task_tracker.di
 
 import android.content.Context
-import com.example.task_tracker.data.TaskDataBase
-import com.example.task_tracker.data.TaskRepository
+import com.example.task_tracker.data.room.TaskDataBase
+import com.example.task_tracker.data.room.TaskRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object TaskModule {
     @Provides
     @Singleton
     fun provideTasksDatabase(@ApplicationContext context: Context): TaskDataBase {

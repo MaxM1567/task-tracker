@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
-import com.example.task_tracker.data.Task
+import com.example.task_tracker.data.room.Task
 
 @Composable
 fun TaskCard(task: Task) {

@@ -9,8 +9,8 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.task_tracker.data.Task
-import com.example.task_tracker.data.TaskRepository
+import com.example.task_tracker.data.room.Task
+import com.example.task_tracker.data.room.TaskRepository
 import com.example.task_tracker.ui.screens.home.FormattedDate
 import com.example.task_tracker.ui.screens.home.getFormattedDate
 import dagger.hilt.android.lifecycle.HiltViewModel

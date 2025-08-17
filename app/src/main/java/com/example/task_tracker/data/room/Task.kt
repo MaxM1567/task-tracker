@@ -1,4 +1,4 @@
-package com.example.task_tracker.data
+package com.example.task_tracker.data.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

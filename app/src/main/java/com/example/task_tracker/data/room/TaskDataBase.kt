@@ -1,4 +1,4 @@
-package com.example.task_tracker.data
+package com.example.task_tracker.data.room
 
 import android.content.Context
 import androidx.room.Database

@@ -1,4 +1,4 @@
-package com.example.task_tracker.data
+package com.example.task_tracker.data.room
 
 import androidx.room.Dao
 import androidx.room.Delete

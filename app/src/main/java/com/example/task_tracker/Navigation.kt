@@ -14,7 +14,7 @@ import androidx.navigation.compose.composable
 import com.example.task_tracker.ui.screens.AddTaskScreen
 import com.example.task_tracker.ui.screens.Screen
 import com.example.task_tracker.ui.screens.Screen.BottomScreen
-import com.example.task_tracker.ui.screens.SettingScreen
+import com.example.task_tracker.ui.screens.settings.SettingScreen
 import com.example.task_tracker.ui.screens.home.HomeScreen
 
 

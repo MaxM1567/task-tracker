@@ -1,5 +1,6 @@
-package com.example.task_tracker.ui.screens
+package com.example.task_tracker.ui.screens.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,18 +11,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun SettingScreen() {
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
+    val settings by settingsViewModel.settings.collectAsState()
+
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -33,20 +36,25 @@ fun SettingScreen() {
         SettingRow(
             title = "Уведомления",
             description = "Напоминать о привычках",
-            action = { TODO() }
+            value = settings.notifications,
+            action = { newValue -> settingsViewModel.updateNotifications(newValue) }
         )
     }
 }
 
 
 @Composable
-fun SettingRow(title: String, description: String, action: () -> Unit) {
-    var checkedStatus by remember { mutableStateOf(false) }
-
+fun SettingRow(
+    title: String,
+    description: String,
+    value: Boolean,
+    action: (Boolean) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .clickable { action(!value) }
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -61,10 +69,8 @@ fun SettingRow(title: String, description: String, action: () -> Unit) {
             }
         }
         Switch(
-            checked = checkedStatus,
-            onCheckedChange = {
-                checkedStatus = !checkedStatus
-            }
+            checked = value,
+            onCheckedChange = action
         )
     }
 }

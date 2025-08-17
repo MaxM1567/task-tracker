@@ -27,7 +27,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.task_tracker.TaskViewModel
-import com.example.task_tracker.data.Task
+import com.example.task_tracker.data.room.Task
 import kotlinx.coroutines.launch
 
 @Composable
@@ -78,6 +78,9 @@ fun AddTaskScreen(
                                 scope.launch {
                                     navController.navigateUp()
                                 }
+
+                                viewModel.taskTitleState = ""
+                                viewModel.taskRepetitions = 1
                             }
                         }
                     ) {
