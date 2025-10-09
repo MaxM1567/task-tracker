@@ -2,7 +2,6 @@ package com.example.task_tracker.data.data_store
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +16,7 @@ class DataStoreManager(private val dataStore: DataStore<Preferences>) {
 
     fun getSettings(): Flow<SettingsData> = dataStore.data.map { pref ->
         SettingsData(
-            notifications = pref[booleanPreferencesKey("notifications")] ?: true
+            notifications = pref[booleanPreferencesKey("notifications")] ?: false
         )
     }
 }
