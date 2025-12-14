@@ -20,7 +20,7 @@ fun SettingRow(
     title: String,
     description: String,
     value: Boolean,
-    action: (Boolean) -> Unit
+    action: (Boolean) -> Unit,
 ) {
     Row(
         modifier = Modifier

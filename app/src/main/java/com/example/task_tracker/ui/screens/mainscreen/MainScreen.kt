@@ -1,4 +1,4 @@
-package com.example.task_tracker.ui.screens.main_screen
+package com.example.task_tracker.ui.screens.mainscreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row

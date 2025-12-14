@@ -1,5 +1,6 @@
 package com.example.task_tracker.ui.screens.settings
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.task_tracker.data.data_store.DataStoreManager
@@ -21,8 +22,12 @@ class SettingsViewModel @Inject constructor(
     )
 
     fun updateNotifications(enable: Boolean) = viewModelScope.launch {
-        dataStoreManager.saveSettings(
-            SettingsData(notifications = enable)
-        )
+        try {
+            dataStoreManager.saveSettings(
+                SettingsData(notifications = enable)
+            )
+        } catch (e: Exception) {
+            Log.e("Error", "updateNotifications(): $e")
+        }
     }
 }

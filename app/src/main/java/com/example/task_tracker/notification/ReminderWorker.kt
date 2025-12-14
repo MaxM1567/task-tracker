@@ -16,6 +16,8 @@ class ReminderWorker(context: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         showNotification("Напоминание", "Пора браться за дело!")
+
+        RemindManager.scheduleNext(applicationContext)
         return Result.success()
     }
 

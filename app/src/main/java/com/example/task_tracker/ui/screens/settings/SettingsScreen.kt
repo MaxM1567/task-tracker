@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.task_tracker.notification.RemindManager
+import com.example.task_tracker.ui.components.ScreenTitle
 import com.example.task_tracker.ui.screens.settings.components.SettingRow
 import com.example.task_tracker.ui.screens.settings.components.handleNotificationToggle
 
@@ -25,11 +26,8 @@ fun SettingScreen() {
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
-        Text(
-            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp),
-            text = "Настройки",
-            style = MaterialTheme.typography.titleMedium
-        )
+        ScreenTitle(text = "Настройки", modifier = Modifier.padding(start = 16.dp, top = 16.dp))
+
         SettingRow(
             title = "Уведомления",
             description = "Напоминать о привычках",
@@ -40,7 +38,7 @@ fun SettingScreen() {
                     enable = newValue,
                     onAllow = {
                         settingsViewModel.updateNotifications(true)
-                        RemindManager.startReminders(context)
+                        RemindManager.scheduleNext(context)
                     },
                     onDeny = {
                         settingsViewModel.updateNotifications(false)

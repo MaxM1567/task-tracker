@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.task_tracker.data.room.TaskRepository
-import com.example.task_tracker.ui.screens.main_screen.MainScreen
+import com.example.task_tracker.ui.screens.mainscreen.MainScreen
 import com.example.task_tracker.ui.theme.Task_trackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

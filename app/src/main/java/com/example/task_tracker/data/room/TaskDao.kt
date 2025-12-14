@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.task_tracker.data.room.task.Task
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -15,6 +16,9 @@ abstract class TaskDao {
 
     @Query("Select * from `task-table`")
     abstract fun getTasks(): Flow<List<Task>>
+
+    @Query("SELECT * FROM `task-table` WHERE id = :id LIMIT 1")
+    abstract suspend fun getTaskById(id: Long): Task
 
     @Update()
     abstract suspend fun updateTask(taskEntity: Task)

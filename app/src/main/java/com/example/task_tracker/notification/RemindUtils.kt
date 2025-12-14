@@ -1,8 +1,10 @@
 package com.example.task_tracker.notification
 
 import android.content.Context
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
+import android.util.Log
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import java.time.Duration
 import java.time.LocalDateTime
@@ -10,34 +12,41 @@ import java.util.concurrent.TimeUnit
 
 object RemindManager {
 
-    private const val REMINDER_TAG = "remind"
+    private const val WORK_NAME = "remind"
 
-    fun startReminders(context: Context) {
-        stopReminders(context)
-        listOf(8, 14, 20).forEach { enqueueReminder(context, it) }
+    fun scheduleNext(context: Context) {
+        try {
+            val delay = millisUntilNextSlot()
+
+            val work = OneTimeWorkRequestBuilder<ReminderWorker>()
+                //.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                .build()
+
+            WorkManager.getInstance(context)
+                .enqueueUniqueWork(
+                    WORK_NAME,
+                    ExistingWorkPolicy.REPLACE,
+                    work
+                )
+        } catch (e: Exception) {
+            Log.e("Error", "scheduleNext(): $e")
+        }
     }
 
-    fun enqueueReminder(context: Context, hour: Int) {
-        val work = PeriodicWorkRequestBuilder<ReminderWorker>(1, TimeUnit.DAYS)
-            .setInitialDelay(hoursUntil(hour), TimeUnit.MILLISECONDS)
-            .addTag(REMINDER_TAG)
-            .build()
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "reminder_$hour",
-            ExistingPeriodicWorkPolicy.UPDATE,
-            work
-        )
-    }
-
-    private fun hoursUntil(hour: Int): Long {
+    private fun millisUntilNextSlot(): Long {
         val now = LocalDateTime.now()
-        var target = now.withHour(hour).withMinute(0).withSecond(0).withNano(0)
-        if (now.isAfter(target)) target = target.plusDays(1)
+        val slots = listOf(8, 14, 20)
+
+        val target = slots
+            .map { now.withHour(it).withMinute(0).withSecond(0) }
+            .firstOrNull { it.isAfter(now) }
+            ?: now.plusDays(1).withHour(8).withMinute(0).withSecond(0)
+
         return Duration.between(now, target).toMillis()
     }
 
     fun stopReminders(context: Context) {
-        val workManager = WorkManager.getInstance(context)
-        workManager.cancelAllWorkByTag(REMINDER_TAG)
+        WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
     }
 }

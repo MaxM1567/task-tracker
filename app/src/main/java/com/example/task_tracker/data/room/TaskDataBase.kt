@@ -4,12 +4,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.example.task_tracker.data.room.convertor.TaskTypeConverter
+import com.example.task_tracker.data.room.task.Task
 
 @Database(
     entities = [Task::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
+@TypeConverters(TaskTypeConverter::class)
 abstract class TaskDataBase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
 
