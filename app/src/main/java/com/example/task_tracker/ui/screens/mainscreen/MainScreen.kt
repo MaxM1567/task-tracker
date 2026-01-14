@@ -27,10 +27,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.task_tracker.Navigation
-import com.example.task_tracker.TaskViewModel
-import com.example.task_tracker.ui.screens.Screen
-import com.example.task_tracker.ui.screens.Screen.BottomScreen
-import com.example.task_tracker.ui.screens.bottomScreens
+import com.example.task_tracker.viewmodel.homevm.TaskViewModel
+import com.example.task_tracker.ui.components.Screen
+import com.example.task_tracker.ui.components.Screen.BottomScreen
+import com.example.task_tracker.ui.components.bottomScreens
 
 
 @OptIn(ExperimentalMaterialApi::class)

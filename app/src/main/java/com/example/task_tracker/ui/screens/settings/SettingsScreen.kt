@@ -3,8 +3,6 @@ package com.example.task_tracker.ui.screens.settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,7 +13,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.task_tracker.notification.RemindManager
 import com.example.task_tracker.ui.components.ScreenTitle
 import com.example.task_tracker.ui.screens.settings.components.SettingRow
-import com.example.task_tracker.ui.screens.settings.components.handleNotificationToggle
+import com.example.task_tracker.viewmodel.settingvm.utils.handleNotificationToggle
+import com.example.task_tracker.viewmodel.settingvm.SettingsViewModel
 
 @Composable
 fun SettingScreen() {

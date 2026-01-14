@@ -1,4 +1,4 @@
-package com.example.task_tracker.ui.screens.settings
+package com.example.task_tracker.viewmodel.settingvm
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -17,7 +17,7 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
     val settings = dataStoreManager.getSettings().stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Eagerly,
+        started = SharingStarted.Companion.Eagerly,
         initialValue = SettingsData(notifications = false)
     )
 

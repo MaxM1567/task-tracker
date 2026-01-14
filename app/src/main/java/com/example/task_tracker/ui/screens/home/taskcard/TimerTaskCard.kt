@@ -98,7 +98,7 @@ fun TimerTaskCard(
 
                 Text(
                     modifier = Modifier.padding(end = 8.dp),
-                    text = formatTime(time),
+                    text = time.toString(),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (isTimerRunning) Color.Green else Color.White

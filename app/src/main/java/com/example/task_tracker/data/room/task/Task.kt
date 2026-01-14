@@ -22,5 +22,5 @@ data class Task(
     val taskType: TaskType,
 
     @ColumnInfo(name = "task-time-spent")
-    val timeSpent: Long = 0L
+    val remainingTime: Long = 0L
 )

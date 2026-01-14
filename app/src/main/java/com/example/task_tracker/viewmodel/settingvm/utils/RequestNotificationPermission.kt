@@ -1,4 +1,4 @@
-package com.example.task_tracker.ui.screens.settings.components
+package com.example.task_tracker.viewmodel.settingvm.utils
 
 import android.Manifest
 import android.content.Context
@@ -22,8 +22,7 @@ fun handleNotificationToggle(
         context = context,
         onGranted = onAllow,
         onDenied = {
-            Toast.makeText(context, "Разрешение на уведомления запрещено", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(context, "Разрешение на уведомления запрещено", Toast.LENGTH_SHORT).show()
             onDeny()
         }
     )

@@ -11,11 +11,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.task_tracker.ui.screens.AddTaskScreen
-import com.example.task_tracker.ui.screens.Screen
-import com.example.task_tracker.ui.screens.Screen.BottomScreen
+import com.example.task_tracker.ui.screens.addtask.AddTaskScreen
+import com.example.task_tracker.ui.components.Screen
+import com.example.task_tracker.ui.components.Screen.BottomScreen
 import com.example.task_tracker.ui.screens.settings.SettingScreen
 import com.example.task_tracker.ui.screens.home.HomeScreen
+import com.example.task_tracker.viewmodel.homevm.TaskViewModel
 
 
 @Composable

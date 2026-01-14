@@ -1,5 +1,6 @@
-package com.example.task_tracker.ui.screens
+package com.example.task_tracker.ui.screens.addtask
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,14 +30,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.task_tracker.TaskViewModel
+import com.example.task_tracker.viewmodel.homevm.TaskViewModel
 import com.example.task_tracker.data.room.task.Task
 import com.example.task_tracker.data.room.task.TaskType
 import com.example.task_tracker.ui.components.ScreenTitle
+import com.example.task_tracker.ui.screens.addtask.component.RequestNotificationPermission
+import com.example.task_tracker.ui.screens.addtask.component.hasPermission
 import kotlinx.coroutines.launch
 
 @Composable
@@ -44,8 +49,15 @@ fun AddTaskScreen(
     viewModel: TaskViewModel,
     navController: NavController
 ) {
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var stopwatchEnable by remember { mutableStateOf(false) }
+    var taskTime by remember { mutableStateOf(0L) }
+    var notifyPermissionGranted by remember { mutableStateOf(hasPermission(context)) }
+
+    if (!notifyPermissionGranted) {
+        RequestNotificationPermission { granted -> notifyPermissionGranted = granted }
+    }
 
     ScreenTitle(text = "Задача", modifier = Modifier.padding(start = 16.dp, top = 16.dp))
 
@@ -80,7 +92,8 @@ fun AddTaskScreen(
                                         Task(
                                             title = viewModel.taskTitleState.trim(),
                                             curRepetitions = viewModel.taskRepetitions,
-                                            taskType = TaskType.StopWatch
+                                            taskType = TaskType.StopWatch,
+                                            remainingTime = taskTime
                                         )
                                     } else {
                                         Task(
@@ -153,33 +166,71 @@ fun AddTaskScreen(
             Spacer(Modifier.padding(8.dp))
         }
 
-
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            if (!notifyPermissionGranted) {
                 Text(
-                    text = "Контроль времени",
-                    fontSize = 16.sp
+                    text = "(Необходимо дать разрешение на отправку уведомлений!)",
+                    color = Color.Red
                 )
-                Text(
-                    text = "Позволяет засекать, затраченное на выполнение время",
-                    fontSize = 14.sp,
-                    color = Color.Gray
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Контроль времени",
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        text = "Отведите время конкретному делу",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
+
+                Spacer(Modifier.width(8.dp))
+
+                Switch(
+                    checked = stopwatchEnable,
+                    onCheckedChange = { stopwatchEnable = !stopwatchEnable },
+                    enabled = notifyPermissionGranted
                 )
             }
 
             Spacer(Modifier.width(8.dp))
 
-            Switch(
-                checked = stopwatchEnable,
-                onCheckedChange = { stopwatchEnable = !stopwatchEnable }
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Времени на выполнение",
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        text = "Сколько вы планируете уделить времени этому делу",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
+
+                Spacer(Modifier.width(16.dp))
+
+                OutlinedTextField(
+                    modifier = Modifier.width(80.dp),
+                    value = taskTime.toString(),
+                    onValueChange = { taskTime = it.toLongOrNull() ?: 0L },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    shape = CircleShape
+                )
+            }
         }
     }
 }
