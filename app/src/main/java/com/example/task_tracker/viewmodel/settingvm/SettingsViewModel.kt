@@ -17,15 +17,13 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
     val settings = dataStoreManager.getSettings().stateIn(
         scope = viewModelScope,
-        started = SharingStarted.Companion.Eagerly,
+        started = SharingStarted.Eagerly,
         initialValue = SettingsData(notifications = false)
     )
 
     fun updateNotifications(enable: Boolean) = viewModelScope.launch {
         try {
-            dataStoreManager.saveSettings(
-                SettingsData(notifications = enable)
-            )
+            dataStoreManager.saveSettings(SettingsData(notifications = enable))
         } catch (e: Exception) {
             Log.e("Error", "updateNotifications(): $e")
         }

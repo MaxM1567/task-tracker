@@ -21,7 +21,6 @@ import com.example.task_tracker.viewmodel.homevm.TaskViewModel
 
 @Composable
 fun Navigation(
-    viewModel: TaskViewModel,
     navController: NavController,
     pd: PaddingValues
 ) {
@@ -33,13 +32,10 @@ fun Navigation(
         exitTransition = { fadeOut(animationSpec = tween(0)) }
     ) {
         composable(route = BottomScreen.HomeScreen.route) {
-            HomeScreen(viewModel = viewModel)
+            HomeScreen()
         }
         composable(route = Screen.AddTaskScreen.route) {
-            AddTaskScreen(
-                viewModel = viewModel,
-                navController = navController
-            )
+            AddTaskScreen(navController)
         }
         composable(route = BottomScreen.SettingsScreen.route) {
             SettingScreen()

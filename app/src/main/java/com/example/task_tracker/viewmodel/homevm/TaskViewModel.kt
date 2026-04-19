@@ -7,13 +7,9 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.task_tracker.data.data_store.DataStoreManager
 import com.example.task_tracker.data.room.TaskRepository
 import com.example.task_tracker.data.room.task.Task
 import com.example.task_tracker.service.TimerService
@@ -21,99 +17,37 @@ import com.example.task_tracker.ui.screens.home.FormattedDate
 import com.example.task_tracker.ui.screens.home.getFormattedDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
+    private val dataStoreManager: DataStoreManager,
     private val application: Application
 ) : ViewModel() {
 
     private val _uiDateState = MutableStateFlow(FormattedDate(0, "", ""))
-    val uiDateState: StateFlow<FormattedDate> = _uiDateState
+    val uiDateState = _uiDateState.asStateFlow()
 
-    var taskTitleState by mutableStateOf("")
-    var taskRepetitions by mutableIntStateOf(1)
+    val taskList: StateFlow<List<Task>> = taskRepository.getTasks()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
-    lateinit var taskList: Flow<List<Task>>
-
-    init {
-        updateDate()
-        viewModelScope.launch {
-            taskList = taskRepository.getTasks()
-        }
-    }
-
-    fun onWishTitleChanged(newString: String) {
-        taskTitleState = newString
-    }
-
-    fun addTask(task: Task) {
-        viewModelScope.launch(Dispatchers.IO) {
-            taskRepository.addTask(task = task)
-        }
-    }
-
-    fun updateTask(task: Task) {
-        viewModelScope.launch(Dispatchers.IO) {
-            taskRepository.updateTask(task = task)
-        }
-    }
-
-    fun deleteTask(task: Task) {
-        viewModelScope.launch(Dispatchers.IO) {
-            taskRepository.deleteTask(task = task)
-        }
-    }
-
-    fun resetTasks() {
-        viewModelScope.launch(Dispatchers.IO) {
-            taskRepository.resetTasks()
-        }
-    }
-
-    fun updateUI() {
-        viewModelScope.launch {
-            if (isNewDay()) {
-                resetTasks()
-                updateDate()
-            }
-        }
-    }
-
-    fun isNewDay(): Boolean {
-        val prefs = application.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        val lastResetDate = prefs.getString("last_reset_date", "")
-
-        return if (lastResetDate != currentDate) {
-            prefs.edit { putString("last_reset_date", currentDate) }
-            true
-        } else {
-            false
-        }
-    }
-
-    fun updateDate() {
-        viewModelScope.launch {
-            _uiDateState.emit(getFormattedDate())
-        }
-    }
-
-    // ------------- TIMER LOGIC -------------
+    // ------------- СОСТОЯНИЕ ТАЙМЕРА -------------
     private val _timerOwner = MutableStateFlow<Long?>(null)
     val timerOwner = _timerOwner.asStateFlow()
 
-    private val _seconds = MutableStateFlow<Int>(0)
+    private val _seconds = MutableStateFlow(0)
     val seconds = _seconds.asStateFlow()
 
     private val _isRunning = MutableStateFlow(false)
@@ -133,6 +67,8 @@ class TaskViewModel @Inject constructor(
     }
 
     init {
+        updateDate()
+        updateUI()
         bindService()
     }
 
@@ -143,92 +79,111 @@ class TaskViewModel @Inject constructor(
     }
 
     private fun observeTimer() {
+        val service = timerService ?: return
         viewModelScope.launch {
-            timerService?.seconds?.collect { newSeconds ->
-                _seconds.value = newSeconds
-                endCountdown()
-            }
-        }
-        viewModelScope.launch {
-            timerService?.isRunning?.collect { running ->
-                _isRunning.value = running
-            }
-        }
-        viewModelScope.launch {
-            timerService?.timerOwner?.collect { timerOwner ->
-                _timerOwner.value = timerOwner
+            combine(
+                service.seconds,
+                service.isRunning,
+                service.timerOwner
+            ) { seconds, running, owner ->
+                TimerState(seconds, running, owner)
+            }.collect { state ->
+                _seconds.value = state.seconds
+                _isRunning.value = state.running
+                _timerOwner.value = state.owner
             }
         }
     }
 
-    fun testStartTimer(taskId: Long, startTime: Int) {
+    private data class TimerState(val seconds: Int, val running: Boolean, val owner: Long?)
+
+    // ------------- УПРАВЛЕНИЕ ЗАДАЧАМИ -------------
+
+    fun updateTask(task: Task) {
+        viewModelScope.launch(Dispatchers.IO) {
+            taskRepository.updateTask(task)
+        }
+    }
+
+    fun deleteTask(task: Task) {
+        viewModelScope.launch(Dispatchers.IO) {
+            taskRepository.deleteTask(task)
+        }
+    }
+
+    fun resetTasks() {
+        viewModelScope.launch(Dispatchers.IO) {
+            taskRepository.resetTasks()
+        }
+    }
+
+    fun updateUI() {
         viewModelScope.launch {
-            if (_timerOwner.value != null) {
-                // Сохранение
-                val task = taskRepository.getTaskById(_timerOwner.value as Long)
-                updateTask(task.copy(remainingTime = _seconds.value.toLong()))
-
-                _timerOwner.value = null
-                _seconds.value = 0
-
-                // Остановка последнего таймера
-                application.startService(
-                    Intent(application, TimerService::class.java).apply {
-                        action = TimerService.Companion.ACTION_STOP
-                    }
-                )
-            }
-
-            delay(1)
-
-            // Старт нового таймера
-            _timerOwner.value = taskId
-            _seconds.value = startTime
-
-            if (startTime > 0 && !_isRunning.value) {
-                application.startForegroundService(
-                    Intent(application, TimerService::class.java).apply {
-                        action = TimerService.Companion.ACTION_START
-                        putExtra(TimerService.Companion.EXTRA_SECONDS, startTime)
-                        putExtra(TimerService.Companion.EXTRA_OWNER, taskId)
-                    }
-                )
+            if (dataStoreManager.checkIsNewDay()) {
+                resetTasks()
+                updateDate()
             }
         }
     }
 
-    fun testStopTimer() {
+    fun updateDate() {
         viewModelScope.launch {
-            if (_timerOwner.value != null) {
-                // Сохранение
-                val task = taskRepository.getTaskById(_timerOwner.value as Long)
-                updateTask(task.copy(remainingTime = _seconds.value.toLong()))
+            _uiDateState.value = getFormattedDate()
+        }
+    }
 
-                _timerOwner.value = null
-                _seconds.value = 0
+    // ------------- ЛОГИКА ТАЙМЕРА -------------
 
-                // Остановка последнего таймера
-                application.startService(
-                    Intent(application, TimerService::class.java).apply {
-                        action = TimerService.Companion.ACTION_STOP
-                    }
-                )
+    fun startTimer(taskId: Long, startTime: Int) {
+        if (startTime <= 0) return
+
+        viewModelScope.launch {
+            // Если запущен другой таймер — сохраняем его и останавливаем
+            val currentOwner = _timerOwner.value
+            if (currentOwner != null && currentOwner != taskId) {
+                saveProgressToDb(currentOwner, _seconds.value.toLong())
+                sendCommandToService(TimerService.ACTION_STOP)
+            }
+
+            val intent = Intent(application, TimerService::class.java).apply {
+                action = TimerService.ACTION_START
+                putExtra(TimerService.EXTRA_SECONDS, startTime)
+                putExtra(TimerService.EXTRA_OWNER, taskId)
+            }
+            application.startForegroundService(intent)
+        }
+    }
+
+    fun stopTimer() {
+        viewModelScope.launch {
+            _timerOwner.value?.let { ownerId ->
+                saveProgressToDb(ownerId, _seconds.value.toLong())
+                sendCommandToService(TimerService.ACTION_STOP)
             }
         }
     }
 
-    suspend fun endCountdown() {
-        if (_timerOwner.value == null || _seconds.value != 0) return
+    private suspend fun saveProgressToDb(taskId: Long, remainingTime: Long) {
+        try {
+            val task = taskRepository.getTaskById(taskId)
+            taskRepository.updateTask(task.copy(curTimer = remainingTime))
+        } catch (e: Exception) {
+            Log.e("TaskViewModel", "Save error", e)
+        }
+    }
 
-        val task = taskRepository.getTaskById(_timerOwner.value as Long)
-        updateTask(task.copy(remainingTime = 0))
-
-        _timerOwner.value = null
-        _seconds.value = 0
+    private fun sendCommandToService(action: String) {
+        application.startService(Intent(application, TimerService::class.java).apply {
+            this.action = action
+        })
     }
 
     override fun onCleared() {
-        application.unbindService(connection)
+        try {
+            application.unbindService(connection)
+        } catch (e: Exception) {
+            Log.e("TaskViewModel", "Unbind error", e)
+        }
         super.onCleared()
     }
 }

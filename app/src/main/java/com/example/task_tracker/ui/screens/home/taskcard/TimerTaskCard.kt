@@ -3,7 +3,6 @@ package com.example.task_tracker.ui.screens.home.taskcard
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +17,7 @@ import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,10 +29,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.task_tracker.data.room.task.Task
+import com.example.task_tracker.utils.formatTime
 import kotlin.math.roundToInt
 
 private const val SWIPE_LEFT = -1
@@ -48,6 +50,20 @@ fun TimerTaskCard(
     onUpdate: (Task) -> Unit,
     onDelete: () -> Unit
 ) {
+    val isFinished = task.curTimer == 0L
+    val timerValue = when {
+        isTimerRunning -> time
+        isFinished -> task.timer
+        else -> task.curTimer
+    }
+
+    val labelTextColor = if (isFinished) Color.DarkGray else Color.Unspecified
+    val timerTextColor = when {
+        isTimerRunning -> Color.Green
+        isFinished -> Color.DarkGray
+        else -> Color.Unspecified
+    }
+
     val swipeState = rememberSwipeableState(initialValue = SWIPE_IDLE)
 
     val density = LocalDensity.current
@@ -81,12 +97,19 @@ fun TimerTaskCard(
             .offset { IntOffset(swipeState.offset.value.roundToInt(), 0) }
     ) {
         Card(
-            shape = RoundedCornerShape(18.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
             modifier = Modifier
                 .fillMaxSize()
                 .height(85.dp)
-                .padding(vertical = 4.dp, horizontal = 16.dp)
+                .padding(vertical = 4.dp, horizontal = 16.dp),
+            shape = RoundedCornerShape(18.dp),
+            colors = CardDefaults.cardColors(
+                containerColor =
+                    if (isFinished)
+                        MaterialTheme.colorScheme.surfaceContainerHighest.darken(0.3f)
+                    else
+                        MaterialTheme.colorScheme.surfaceContainerHighest
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         ) {
             Row(
                 modifier = Modifier
@@ -94,14 +117,19 @@ fun TimerTaskCard(
                     .padding(horizontal = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(modifier = Modifier.weight(1f), text = task.title, fontSize = 18.sp)
+                Text(
+                    text = task.title,
+                    modifier = Modifier.weight(1f),
+                    color = labelTextColor,
+                    fontSize = 18.sp
+                )
 
                 Text(
+                    text = formatTime(timerValue),
                     modifier = Modifier.padding(end = 8.dp),
-                    text = time.toString(),
+                    color = timerTextColor,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isTimerRunning) Color.Green else Color.White
                 )
             }
         }
@@ -117,13 +145,6 @@ fun TimerTaskCard(
             SWIPE_LEFT -> onDelete()
         }
     }
-}
-
-fun formatTime(seconds: Long): String {
-    val hours = seconds / 3600
-    val minutes = seconds % 3600 / 60
-    val seconds = seconds % 60
-    return "%02d:%02d:%02d".format(hours, minutes, seconds)
 }
 
 private fun Task.decrease(): Task =

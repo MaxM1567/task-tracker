@@ -1,0 +1,81 @@
+package com.example.task_tracker.ui.screens.mainscreen.component
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.task_tracker.ui.components.Screen
+import com.example.task_tracker.ui.components.Screen.BottomScreen
+import com.example.task_tracker.ui.components.bottomScreens
+
+@Composable
+fun HomeBottomBar(navController: NavController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, bottom = 32.dp)
+            .background(color = Color.Transparent),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Surface(
+            shape = CircleShape,
+            shadowElevation = 8.dp,
+            modifier = Modifier
+                .weight(1f)
+                .padding(
+                    end = when (currentRoute) {
+                        BottomScreen.HomeScreen.route -> 16.dp
+                        else -> 0.dp
+                    }
+                )
+        ) {
+            BottomNavigation(
+                modifier = Modifier.clip(CircleShape),
+                elevation = 0.dp,
+                backgroundColor = FloatingActionButtonDefaults.containerColor
+            ) {
+                bottomScreens.forEach { item ->
+                    BottomNavigationItem(
+                        selected = false,
+                        onClick = { navController.navigate(item.bRoute) },
+                        icon = { Icon(imageVector = item.icon, contentDescription = null) })
+                }
+            }
+        }
+
+        if (currentRoute == BottomScreen.HomeScreen.route) {
+            FloatingActionButton(
+                onClick = { navController.navigate(Screen.AddTaskScreen.route) },
+                modifier = Modifier.size(56.dp),
+                shape = CircleShape,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add"
+                )
+            }
+        }
+    }
+}

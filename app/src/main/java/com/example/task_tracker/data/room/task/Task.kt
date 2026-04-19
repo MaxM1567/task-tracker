@@ -9,18 +9,21 @@ data class Task(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
 
-    @ColumnInfo(name = "task-title")
+    @ColumnInfo(name = "title")
     val title: String,
 
-    @ColumnInfo(name = "task-repetitions")
-    val repetitions: Int = 1,
-
-    @ColumnInfo(name = "task-cur-repetitions")
-    val curRepetitions: Int = 1,
-
-    @ColumnInfo(name = "task-type")
+    @ColumnInfo(name = "type")
     val taskType: TaskType,
 
-    @ColumnInfo(name = "task-time-spent")
-    val remainingTime: Long = 0L
+    @ColumnInfo(name = "repetitions")
+    val repetitions: Int = 1,
+
+    @ColumnInfo(name = "cur-repetitions")
+    val curRepetitions: Int = 1,
+
+    @ColumnInfo(name = "timer")
+    val timer: Long = 0L,
+
+    @ColumnInfo(name = "cur-timer")
+    val curTimer: Long = 0L
 )

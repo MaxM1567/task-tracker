@@ -160,9 +160,7 @@ fun TaskCard(
     val swipeState = rememberSwipeableState(initialValue = SWIPE_IDLE)
 
     val density = LocalDensity.current
-    val screenWidthPx = with(density) {
-        LocalConfiguration.current.screenWidthDp.dp.toPx()
-    }
+    val screenWidthPx = with(density) { LocalConfiguration.current.screenWidthDp.dp.toPx() }
 
     val anchors = remember {
         mapOf(
@@ -221,13 +219,14 @@ fun TaskCard(
                     color = textColor
                 )
 
-                Text(
-                    text = "$displayReps ${repetitionsPostfix(displayReps)}",
-                    color = textColor,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    textDecoration = if (isFinished) TextDecoration.LineThrough else null
-                )
+                if (task.repetitions > 1) {
+                    Text(
+                        text = "$displayReps ${repetitionsPostfix(displayReps)}",
+                        color = textColor,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }

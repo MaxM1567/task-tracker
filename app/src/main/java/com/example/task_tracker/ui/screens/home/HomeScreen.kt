@@ -12,19 +12,23 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.task_tracker.viewmodel.homevm.TaskViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.task_tracker.data.room.task.TaskType
 import com.example.task_tracker.ui.components.ScreenTitle
 import com.example.task_tracker.ui.screens.home.taskcard.TaskCard
 import com.example.task_tracker.ui.screens.home.taskcard.TimerTaskCard
+import com.example.task_tracker.viewmodel.homevm.TaskViewModel
 
 @Composable
-fun HomeScreen(viewModel: TaskViewModel) {
-    val date by viewModel.uiDateState.collectAsState()
-    val taskList = viewModel.taskList.collectAsState(initial = listOf())
+fun HomeScreen() {
+    val taskViewModel: TaskViewModel = hiltViewModel()
 
-    val timerOwner by viewModel.timerOwner.collectAsState()
-    val seconds by viewModel.seconds.collectAsState()
+    val date by taskViewModel.uiDateState.collectAsStateWithLifecycle()
+    val taskList by taskViewModel.taskList.collectAsState(initial = listOf())
+
+    val timerOwner by taskViewModel.timerOwner.collectAsState()
+    val seconds by taskViewModel.seconds.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize()) {
         ScreenTitle(
@@ -39,14 +43,17 @@ fun HomeScreen(viewModel: TaskViewModel) {
         )
 
         LazyColumn(Modifier.fillMaxSize()) {
-            items(taskList.value, key = { it.id }) { task ->
+            items(
+                items = taskList,
+                key = { it.id }
+            ) { task ->
                 when (task.taskType) {
 
                     is TaskType.Repeatable -> {
                         TaskCard(
                             task = task,
-                            onUpdate = viewModel::updateTask,
-                            onDelete = { viewModel.deleteTask(task) }
+                            onUpdate = taskViewModel::updateTask,
+                            onDelete = { taskViewModel.deleteTask(task) }
                         )
                     }
 
@@ -56,22 +63,22 @@ fun HomeScreen(viewModel: TaskViewModel) {
                         TimerTaskCard(
                             task = task,
                             isTimerRunning = isRunning,
-                            time = if (isRunning) seconds.toLong() else task.remainingTime,
+                            time = if (isRunning) seconds.toLong() else task.timer,
                             onUpdate = {
                                 if (isRunning) {
-                                    viewModel.testStopTimer()
+                                    taskViewModel.stopTimer()
                                 } else {
-                                    viewModel.testStartTimer(
+                                    taskViewModel.startTimer(
                                         taskId = task.id,
-                                        startTime = task.remainingTime.toInt()
+                                        startTime = task.curTimer.toInt()
                                     )
                                 }
                             },
                             onDelete = {
                                 if (isRunning) {
-                                    viewModel.testStopTimer()
+                                    taskViewModel.stopTimer()
                                 }
-                                viewModel.deleteTask(task)
+                                taskViewModel.deleteTask(task)
                             }
                         )
                     }

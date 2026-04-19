@@ -19,10 +19,12 @@ class TaskRepository @Inject constructor(
 
     suspend fun resetTasks() {
         val tasks = getTasks().first()
+
         tasks.forEach { task ->
             updateTask(
                 task.copy(
-                    curRepetitions = task.repetitions
+                    curRepetitions = task.repetitions,
+                    curTimer = task.timer
                 )
             )
         }

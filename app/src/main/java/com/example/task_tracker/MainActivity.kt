@@ -5,9 +5,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
-import com.example.task_tracker.data.room.TaskRepository
+import com.example.task_tracker.data.data_store.DataStoreManager
 import com.example.task_tracker.ui.screens.mainscreen.MainScreen
 import com.example.task_tracker.ui.theme.Task_trackerTheme
 import com.example.task_tracker.viewmodel.homevm.TaskViewModel
@@ -16,19 +15,17 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    @Inject
-    lateinit var taskRepository: TaskRepository
+    //@Inject
+    //lateinit var taskRepository: TaskRepository
     private val viewModel: TaskViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             Task_trackerTheme {
-                val viewModel: TaskViewModel = hiltViewModel()
-
                 MainScreen(
-                    viewModel = viewModel,
                     navController = rememberNavController()
                 )
             }
